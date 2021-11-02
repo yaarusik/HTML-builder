@@ -22,6 +22,6 @@ stdin.on("data", (data) => {
 });
 
 process.on("SIGINT", function () {
-  console.log("\nДо свидания, заходите ещё");
+  console.log("До свидания, заходите ещё");
   process.exit();
 });

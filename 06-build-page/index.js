@@ -7,8 +7,8 @@ const newPath = path.join(__dirname, "project-dist");
 const newIndexHtml = path.join(newPath, "index.html");
 const stylePath = path.join(__dirname, "styles");
 const newStyleCss = path.join(newPath, "style.css");
-const newImgPath = path.join(newPath, 'assets');
-const imgPath = path.join(__dirname, 'assets');
+const newImgPath = path.join(newPath, "assets");
+const imgPath = path.join(__dirname, "assets");
 
 let componentsArr = [];
 
@@ -53,10 +53,12 @@ async function addFilesToArr(item, dir) {
 // заменяем теги на компоненты
 async function changeTags(template) {
   let file = template.toString();
+  console.log(file);
   file = file
-    .replace(/\{\{header\}\}/, componentsArr[2])
-    .replace(/\{\{footer\}\}/, componentsArr[1])
-    .replace(/\{\{articles\}\}/, componentsArr[0]);
+    .replace(/\{\{header\}\}/, componentsArr[componentsArr.length - 1])
+    .replace(/\{\{footer\}\}/, componentsArr[componentsArr.length - 2])
+    .replace(/\{\{articles\}\}/, componentsArr[componentsArr.length - 3])
+    .replace(/\{\{about\}\}/, componentsArr[componentsArr.length - 4]);
 
   return file;
 }
@@ -78,65 +80,54 @@ async function createStyle(arr) {
 }
 
 async function deleteInner(filePath) {
-  try{
+  try {
     await fs.access(filePath);
-    await fs.truncate(filePath);  
-  } catch(e){
-
-  }
+    await fs.truncate(filePath);
+  } catch (e) {}
 }
 
-
-
 // удаляем содержимое папок
-async function checkUpdateAssets(newImgPath){
- try {
-  await fs.access(newImgPath);
-   const files = await fs.readdir(newImgPath);
-   files.forEach(async (file) => {
-    const newFile = path.join(newImgPath, file);
-    const stat = await fs.stat(newFile);
-    if (stat.isDirectory()) {
-      await checkUpdateAssets(newFile);  
-    } else {
-      await fs.unlink(newFile);
-    }  
-    
-    
-  });
- } catch (error) {
-   
- }
+async function checkUpdateAssets(newImgPath) {
+  try {
+    await fs.access(newImgPath);
+    const files = await fs.readdir(newImgPath);
+    files.forEach(async (file) => {
+      const newFile = path.join(newImgPath, file);
+      const stat = await fs.stat(newFile);
+      if (stat.isDirectory()) {
+        await checkUpdateAssets(newFile);
+      } else {
+        await fs.unlink(newFile);
+      }
+    });
+  } catch (error) {}
 }
 
 // отслеживаем удаление папки
-async function delAssetsPath(imgPath, newImgPath){
+async function delAssetsPath(imgPath, newImgPath) {
   try {
-  await fs.access(newImgPath);
-  let indicator = [];
-   const files = await fs.readdir(imgPath);
-   const newFiles = await fs.readdir(newImgPath);
-   
-   if(files.length != newFiles.length){
+    await fs.access(newImgPath);
+    let indicator = [];
+    const files = await fs.readdir(imgPath);
+    const newFiles = await fs.readdir(newImgPath);
+
+    if (files.length != newFiles.length) {
       newFiles.forEach(async (file) => {
-      indicator.push(file);
-  });
-   files.forEach(async (file) => {
-      indicator = indicator.filter(item => item != file);
-  });
-  indicator.forEach(async(file) => {
-    await checkUpdateAssets(newImgPath);
-    await fs.rmdir(path.join(newImgPath, file));
-  })
-   }
- } catch (error) {
-   
- }
+        indicator.push(file);
+      });
+      files.forEach(async (file) => {
+        indicator = indicator.filter((item) => item != file);
+      });
+      indicator.forEach(async (file) => {
+        await checkUpdateAssets(newImgPath);
+        await fs.rmdir(path.join(newImgPath, file));
+      });
+    }
+  } catch (error) {}
 }
 
-
 // копируем и обновляем папку
-async function copyAssets(newImgPath, imgPath){
+async function copyAssets(newImgPath, imgPath) {
   await fs.mkdir(newImgPath, { recursive: true });
   const files = await fs.readdir(imgPath);
 
