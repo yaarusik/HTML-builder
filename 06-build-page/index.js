@@ -53,7 +53,7 @@ async function addFilesToArr(item, dir) {
 // заменяем теги на компоненты
 async function changeTags(template) {
   let file = template.toString();
-  console.log(file);
+  // console.log(file);
   file = file
     .replace(/\{\{header\}\}/, componentsArr[componentsArr.length - 1])
     .replace(/\{\{footer\}\}/, componentsArr[componentsArr.length - 2])
