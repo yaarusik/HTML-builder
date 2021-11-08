@@ -53,12 +53,26 @@ async function addFilesToArr(item, dir) {
 // заменяем теги на компоненты
 async function changeTags(template) {
   let file = template.toString();
+  const tags = file.match(/{{.*}}/gi);
+  let a = [];
+  for (let item of tags) {
+    a.push(item.replace(" ", ","));
+  }
+  a = a.join(",").split(",");
+  for (let item of a) {
+    const tagFile = item.substr(2, item.length - 4);
+    console.log(tagFile);
+    const component = await fs.readFile(
+      path.join(componentsPath, `${tagFile}.html`)
+    );
+    file = file.replace(item, component.toString());
+  }
   // console.log(file);
-  file = file
-    .replace(/\{\{header\}\}/, componentsArr[componentsArr.length - 1])
-    .replace(/\{\{footer\}\}/, componentsArr[componentsArr.length - 2])
-    .replace(/\{\{articles\}\}/, componentsArr[componentsArr.length - 3])
-    .replace(/\{\{about\}\}/, componentsArr[componentsArr.length - 4]);
+  // file = file
+  //   .replace(/\{\{header\}\}/, componentsArr[componentsArr.length - 1])
+  //   .replace(/\{\{footer\}\}/, componentsArr[componentsArr.length - 2])
+  //   .replace(/\{\{articles\}\}/, componentsArr[componentsArr.length - 3])
+  //   .replace(/\{\{about\}\}/, componentsArr[componentsArr.length - 4]);
 
   return file;
 }
